@@ -1,0 +1,176 @@
+---
+title: "Standard Normal Distribution"
+format: html
+editor: visual
+---
+
+## 1. Original Population
+
+The original population follows a standard normal distribution. It is symmetric and bell-shaped, centered at 0.
+
+**Theoretical mean:** 0\
+**Theoretical standard deviation:** 1
+
+```{r}
+set.seed(123)
+
+population <- rnorm(10000, mean = 0, sd = 1)
+
+hist(population,
+     breaks = 30,
+     main = "Standard Normal Population", 
+     xlab = "Value")
+
+```
+
+## 2. Monte Carlo Simulation
+
+I used Monte Carlo simulation to examine the sampling distribution of the sample mean at different sample sizes. For each sample size, I repeatedly drew samples from the standard normal population and calculated the mean of each sample.
+
+**Sample sizes tested:** 2, 3, 5, 10, 20, 30, 50, 100
+
+**Number of simulations:** 10,000 for each sample size
+
+```{r}
+# sample sizes to test
+sample_sizes <- c(2, 3, 5, 10, 20, 30, 50, 100)
+
+# number of repeated samples
+num_simulations <- 10000
+
+# function to simulate sample means
+simulate_means <- function(n) {
+  replicate(
+    num_simulations, 
+    mean(rnorm(n, mean = 0, sd = 1))
+  )
+}
+
+# run the simulation for every sample size
+simulation_results <- lapply(sample_sizes, simulate_means)
+
+# name each result by its sample size
+names(simulation_results) <- sample_sizes
+```
+
+## 3. Visual Evidence
+
+I used visual evidence to examine how the sampling distribution changes as the sample size increases.
+
+### Histograms
+
+The histograms below show the distribution of the 10,000 sample means for each sample size. I use these plots to examine whether the sampling distributions appear symmetric and bell-shaped as the sample size increases.
+
+```{r}
+par(mfrow = c(2, 4))
+
+for (n in sample_sizes) {
+  hist(
+    simulation_results[[as.character(n)]],
+    breaks = 20,
+    main = paste("n =", n),
+    col = "steelblue",
+    border = "white",
+    xlab = "Sample Mean"
+    )
+}
+
+par(mfrow = c(1, 1))
+```
+
+### Normal Q-Q Plots
+
+Normal Q-Q plots provide another way to compare the sampling distributions with a theoretical normal distribution. Points that follow the reference line closely provide evidence that the distribution is approximately normal.
+
+```{r}
+par(mfrow = c(2, 4))
+
+for (n in sample_sizes) {
+  qqnorm(
+    simulation_results[[as.character(n)]],
+    main = paste("n =", n),
+    col = "steelblue"
+  )
+  
+  qqline(
+    simulation_results[[as.character(n)]],
+    col = "red",
+    lwd = 2)
+}
+par(mfrow = c(1, 1))
+```
+
+## 4. Numerical Evidence
+
+In addition to the visual evidence, I calculated numerical diagnostics for each sample size. I compared the simulated mean and standard error with their theoretical values and examined skewness and kurtosis as additional measures of normality.
+
+```{r}
+# function to calculate skewness
+skew <- function(x) {
+  m3 <- mean((x - mean(x))^3)
+  m2 <- mean((x - mean(x))^2)
+  m3 / m2^(3/2)
+}
+
+# function to calculate excess kurtosis
+kurt <- function(x) {
+  m4 <- mean((x - mean(x))^4)
+  m2 <- mean((x - mean(x))^2)
+  m4 / m2^2 - 3
+}
+
+# table of results
+results_table <- data.frame(
+  sample_size = sample_sizes,
+  
+  simulated_mean = round(
+    sapply(simulation_results, mean), 3
+  ),
+  
+  simulated_se = round(
+    sapply(simulation_results, sd), 3
+  ),
+  
+  theoretical_se = round(
+    1 / sqrt(sample_sizes), 3
+  ),
+  
+  skewness = round(
+    sapply(simulation_results, skew), 3
+  ),
+  
+  excess_kurtosis = round(
+    sapply(simulation_results, kurt), 3
+  )
+)
+
+results_table
+```
+
+The numerical results support the visual evidence. Across all sample sizes, the simulated means are very close to the theoretical mean of 0. The simulated standard errors are also very close to the theoretical standard errors. Skewness and excess kurtosis remain close to 0 for all sample sizes, which is consistent with a normal distribution.
+
+As the sample size increases, the standard error decreases, so the sampling distributions become more concentrated around the population mean. However, the distribution is already approximately normal even at the smallest sample size tested, n = 2.
+
+## 5. Approximately Normal?
+
+**Selected sample size (n): 2**
+
+I consider the sampling distribution approximately normal at n = 2, the smallest sample size tested. The histogram at n = 2 is already symmetric and bell-shaped, and the Q-Q plot closely follows the reference line. The numerical evidence also supports this conclusion: the skewness (-0.019) and excess kurtosis (-0.007) are both very close to 0.
+
+Although some larger sample sizes have skewness or kurtosis values even closer to 0, the goal is not to find the sample size with the most perfect numerical values. Instead, I am looking for the smallest sample size where there is enough evidence to consider the sampling distribution approximately normal. Small differences in skewness and kurtosis across the simulations are also expected because the results are based on random simulation.
+
+The simulated standard error at n = 2 is 0.708, which is nearly identical to the theoretical standard error of 0.707. As n increases, the standard error becomes smaller and the histograms become narrower around 0. However, a narrower sampling distribution does not necessarily mean it is more normal; it means the sample means have less variability.
+
+The commonly used n = 30 guideline is therefore not necessary for this population. Because the original population is already normally distributed, the sampling distribution of the sample mean is also normal even for small sample sizes. Since n = 2 is the smallest sample size I tested and it already satisfies the visual and numerical evidence for normality, I selected n = 2.
+
+## 6. Limitations and Surprises
+
+One limitation of this experiment is that the smallest sample size tested was n = 2. Since the original population is already normally distributed, the sampling distribution of the mean is normal even at very small sample sizes. Therefore, this experiment does not show the gradual approach toward normality that may occur with non-normal populations.
+
+One notable result was that increasing the sample size mainly reduced the spread of the sampling distribution rather than changing its shape. The sampling distributions were already approximately normal at n = 2, but became more concentrated around the population mean as n increased.
+
+## 7. Conclusion
+
+The Standard Normal population showed that a large sample size is not always necessary for the sampling distribution of the sample mean to be normal. All tested sample sizes produced approximately normal sampling distributions, including the smallest sample size of n = 2.
+
+As the sample size increased, the standard error decreased and the sample means became more concentrated around the population mean of 0. However, the overall shape was already normal at small sample sizes because the original population is normally distributed. This shows that the commonly used n = 30 guideline is not a universal requirement for the Central Limit Theorem. Increasing n in this experiment mainly reduced the standard error rather than making the sampling distribution substantially “more normal.” Therefore, the original population distribution matters when determining how large a sample size is needed.
