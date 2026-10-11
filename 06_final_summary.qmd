@@ -4,23 +4,50 @@ format: html
 editor: visual
 ---
 
-## Quarto
+## 1. Introduction
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+The goal of this project is to investigate how quickly the sampling distribution of the sample mean becomes approximately Normal as the sample size increases. Using Monte Carlo simulations, I explored five different distributions: Standard Normal, Six-Sided Die, Exponential, Binomial, and Cauchy.
 
-## Running Code
+For each distribution, I simulated 10,000 sample means at different sample sizes and used histograms, Normal Q-Q plots, and numerical evidence to determine the smallest sample size I consider approximately Normal.
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+Through these experiments, I wanted to understand how the shape of the original population affects the Central Limit Theorem and whether the common rule of n = 30 is always enough.
 
-```{r}
-1 + 1
-```
+## 2. Summary of Results
 
-You can add options to executable code like this
+| Distribution      | Population Shape        | Smallest n Selected |
+|-------------------|-------------------------|---------------------|
+| Standard Normal   | Symmetric, Normal       | 2                   |
+| Six-Sided Die     | Discrete, Uniform       | 10                  |
+| Exponential       | Right-skewed            | 30                  |
+| Binomial (5, 0.1) | Discrete, Right-skewed  | 40                  |
+| Cauchy            | Symmetric, Heavy-tailed | None                |
 
-```{r}
-#| echo: false
-2 * 2
-```
+## 3. Comparing the Five Distributions
 
-The `echo: false` option disables the printing of code (only output is displayed).
+In my simulations, I noticed that the shape of the original population affected how quickly the sampling distribution of the sample mean became approximately Normal.
+
+The **Standard Normal Distribution** had the smallest selected n, since the sample means were already Normally distributed at n = 2. The **Six-Sided Die** also became approximately Normal fairly quickly at n = 10, even though the original population was discrete. This may be because the die distribution is symmetric.
+
+For the **Exponential distribution,** I selected n = 30 because its right-skewed shape took longer to become approximately Normal. The **Binomial distribution** required an even larger sample size of n = 40, since it was both discrete and right-skewed.
+
+The **Cauchy distribution** was different from all the others. Even at n = 100, the sampling distribution did not become more Normal or narrower. This is because the Cauchy distribution has no defined mean or variance, so the usual Central Limit Theorem does not apply.
+
+Overall, I found that symmetric distributions tended to become approximately Normal faster than skewed distributions in my experiments. However, the Cauchy distribution showed that symmetry alone is not enough. The conditions of the Central Limit Theorem must also be satisfied.
+
+## 4. Is n = 30 Always Enough?
+
+Based on my simulations, I found that **n = 30 is not always enough** for the sampling distribution of the sample mean to become approximately Normal. The sample size needed depends on the shape and characteristics of the original population.
+
+For the Standard Normal and Six-Sided Die distributions, I selected n = 2 and n = 10, which are both smaller than 30. The Exponential distribution became approximately Normal at n = 30, while the Binomial distribution needed a larger sample size of n = 40 based on my visual and numerical evidence.
+
+However, the Cauchy distribution showed that increasing the sample size does not always lead to a Normal distribution. Since its mean and variance are undefined, the usual Central Limit Theorem does not apply, regardless of how large n becomes.
+
+Overall, I learned that **n = 30 is only a general guideline, not a universal rule**. Deciding whether a sampling distribution is approximately Normal also depends on how closely the histograms and Q-Q plots resemble a Normal distribution, along with the numerical evidence. Different people may select slightly different sample sizes depending on what they consider approximately Normal.
+
+## 5. Final Conclusion and Limitations
+
+Through this project, I learned that the Central Limit Theorem does not mean every sampling distribution becomes approximately Normal at n = 30. The sample size needed depends on the original population's shape, skewness, and whether the conditions of the Central Limit Theorem are satisfied.
+
+One limitation of my experiment is that I only tested specific sample sizes with 10,000 simulations each. This means I may have missed a smaller sample size that could also be considered approximately Normal. Also, deciding whether a distribution is approximately Normal is somewhat subjective, since the histograms and Q-Q plots may not look perfectly Normal even at larger sample sizes.
+
+Overall, this project helped me better understand how the Central Limit Theorem works in practice. I found that some distributions approach Normal much faster than others, while the Cauchy distribution does not approach Normal at all. My main takeaway is that **n = 30 should not be treated as a fixed rule**, and it is important to consider the original population and the evidence before deciding whether a sampling distribution is approximately Normal.
