@@ -13,7 +13,8 @@ The original population follows an Exponential distribution with a rate paramete
 **Theoretical standard deviation:** 1
 
 ```{r}
-set.seed(123)
+student_id <- 3491
+set.seed(student_id)
 
 population <- rexp(10000, rate = 1)
 
@@ -190,9 +191,9 @@ From the numerical results, I notice that the simulated means stay close to 1, a
 
 I consider the sampling distribution approximately normal at n = 30. From the histograms, I notice that the distribution becomes more symmetric and bell-shaped, and the bars follow the red Normal curve fairly closely. The Q-Q plot also shows that most of the points follow the reference line, although there are still some deviations at the tails.
 
-I considered n = 20 because its histogram already looks fairly bell-shaped. The numerical results at n = 20 are also promising, with skewness of 0.400 and excess kurtosis of 0.123. However, the Q-Q plot still shows noticeable curvature, especially at the tails. At n = 30, the points follow the reference line more closely, which makes me more comfortable calling the distribution approximately normal.
+I considered n = 20 because its histogram already looks fairly bell-shaped. The numerical results at n = 20 are also promising, with skewness of 0.459 and excess kurtosis of 0.403. However, the Q-Q plot still shows noticeable curvature, especially at the tails. At n = 30, the points follow the reference line more closely, which makes me more comfortable calling the distribution approximately normal.
 
-The numerical evidence also supports this. At n = 30, the simulated mean is 1.001, which is very close to the theoretical mean of 1. The simulated and theoretical standard errors are both 0.183, showing that the simulation agrees with the expected variability of the sample means. The skewness is 0.354 and excess kurtosis is 0.194. Although these values are not exactly 0 and some right skewness remains, they are much closer to 0 compared to smaller sample sizes such as n = 2.
+The numerical evidence also supports this. At n = 30, the simulated mean is 0.997, which is very close to the theoretical mean of 1. The simulated standard error is 0.182, which is close to the theoretical standard error of 0.183, showing that the simulation agrees with the expected variability of the sample means. The skewness is 0.326 and excess kurtosis is 0.080. Although these values are not exactly 0 and some right skewness remains, they are much closer to 0 compared to smaller sample sizes such as n = 2.
 
 I also noticed that n = 40 and n = 50 follow the Normal curve and Q-Q reference line more closely. However, the goal is to find the smallest sample size that I can call approximately normal, rather than finding the closest or most perfect fit. Based on both the visual and numerical evidence, I'd say the sampling distribution is approximately normal at n = 30 for the Exponential population.
 

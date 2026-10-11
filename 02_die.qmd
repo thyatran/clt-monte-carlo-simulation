@@ -14,7 +14,8 @@ The original population represents the outcomes of rolling a fair six-sided die.
 
 ```{r}
 
-set.seed(123)
+student_id <- 3491
+set.seed(student_id)
 
 population <- sample(1:6, size = 10000, replace = TRUE)
 
@@ -185,7 +186,7 @@ I consider the sampling distribution approximately normal at n = 10. From the hi
 
 At smaller sample sizes, especially n = 2 and n = 5, the histograms have more noticeable gaps and spikes, and the Q-Q plots show more steps. By n = 10, these differences become less noticeable, the bars aligned closely with the reference curve, which makes me comfortable considering the sampling distribution approximately normal.
 
-The numerical evidence also supports my decision. At n = 10, the skewness is -0.031, which is close to 0, and the excess kurtosis is -0.181. Although the excess kurtosis is not exactly 0, it is much closer than at n = 2 (-0.657). The simulated standard error is 0.536, which is close to the theoretical standard error of 0.540. This shows that the simulation agrees with the expected variability of the sample means, although matching standard errors alone does not prove normality.
+The numerical evidence also supports my decision. At n = 10, the skewness is -0.011, which is close to 0, and the excess kurtosis is -0.144. Although the excess kurtosis is not exactly 0, it is much closer than at n = 2 (-0.619). The simulated standard error is 0.542, which is close to the theoretical standard error of 0.540. This shows that the simulation agrees with the expected variability of the sample means, although matching standard errors alone does not prove normality.
 
 While the sampling distributions at n = 20 and above follow the Normal curve more closely, the goal is to find the smallest sample size where the sampling distribution looks approximately normal, rather than the sample size with the closest fit. Based on the visual and numerical evidence, n = 10 seems reasonable.
 
@@ -202,3 +203,39 @@ The Six-Sided Die experiment showed that the sampling distribution of the sample
 As the sample size increased, the histograms became smoother and more bell-shaped, and the Q-Q plots followed the reference line more closely. The standard error also decreased, meaning the sample means became more concentrated around the theoretical mean of 3.5. This supports the Central Limit Theorem, which states that the sampling distribution of the sample mean approaches a Normal distribution as the sample size increases, assuming the necessary conditions are met.
 
 Unlike the Standard Normal experiment, where the sampling distribution was already normal at n = 2, the Six-Sided Die experiment showed a more noticeable change in shape as the sample size increased. This suggests that n = 30 is not always necessary, and the sample size needed for approximate normality depends on the original population.
+
+## 8. Reproducibility Experiment
+
+```{r}
+# rerun the experiment using a different seed
+set.seed(3492)
+
+new_simulation_results <- lapply(sample_sizes, simulate_means)
+names(new_simulation_results) <- sample_sizes
+
+# compare results from the original and new seeds
+comparison_table <- data.frame(
+  sample_size = sample_sizes,
+  original_mean = round(sapply(simulation_results, mean), 3),
+  new_mean = round(sapply(new_simulation_results, mean), 3),
+  original_se = round(sapply(simulation_results, sd), 3),
+  new_se = round(sapply(new_simulation_results, sd), 3)
+)
+
+comparison_table
+```
+### Reproducibility
+
+I reran the Six-Sided Die simulation using a different random seed (3492) and compared the results with my original simulation using seed 3491.
+
+**Did the exact results change?**
+
+Yes the numerical results changed slightly when I used a different random seed. For example, at n = 10, the simulated mean changed from 3.499 to 3.506, while the simulated standard error remained 0.542 when rounded to three decimal places. Overall, the simulated means stayed close to the theoretical mean of 3.5, and the standard errors decreased as n increased.
+
+**Did my scientific conclusion changed?**
+
+My conclusion did not change. I still consider n = 10 approximately Normal based on my original visual and numerical evidence. The new results showed similar numerical patterns, so I did not find a reason to change my selected sample size.
+
+**What does this show about Monte Carlo simulation and reproducibility?**
+
+This experiment showed me that changing the random seed can produce slightly different numerical results because the simulations use random samples. However, the overall patterns can remain consistent even when the exact numbers change. Using the same seed, code, and settings allows the simulation results to be reproduced.

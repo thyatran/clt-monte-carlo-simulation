@@ -12,7 +12,8 @@ The original population follows a standard normal distribution. It is symmetric 
 **Theoretical standard deviation:** 1
 
 ```{r}
-set.seed(123)
+student_id <- 3491
+set.seed(student_id)
 
 population <- rnorm(10000, mean = 0, sd = 1)
 
@@ -173,11 +174,11 @@ As the sample size increases, the standard error decreases, so the sampling dist
 
 **Selected sample size (n): 2**
 
-I consider the sampling distribution approximately normal at n = 2, the smallest sample size tested. The histogram at n = 2 is already symmetric and bell-shaped, and the Q-Q plot closely follows the reference line. The numerical evidence also supports this conclusion: the skewness (-0.019) and excess kurtosis (-0.007) are both very close to 0.
+I consider the sampling distribution approximately normal at n = 2, the smallest sample size tested. The histogram at n = 2 is already symmetric and bell-shaped, and the Q-Q plot closely follows the reference line. The numerical evidence also supports this conclusion: the skewness (-0.007) and excess kurtosis (-0.060) are both very close to 0.
 
 Although some larger sample sizes have skewness or kurtosis values even closer to 0, the goal is not to find the sample size with the most perfect numerical values. Instead, I am looking for the smallest sample size where there is enough evidence to consider the sampling distribution approximately normal. Small differences in skewness and kurtosis across the simulations are also expected because the results are based on random simulation.
 
-The simulated standard error (simulated_se) at n = 2 is 0.708, which is nearly identical to the theoretical standard error (theoretical_se) of 0.707. As n increases, the standard error becomes smaller and the histograms become narrower around 0. However, a narrower sampling distribution does not necessarily mean it is more normal; it means the sample means have less variability.
+The simulated standard error (simulated_se) at n = 2 is 0.711, which is nearly identical to the theoretical standard error (theoretical_se) of 0.707. As n increases, the standard error becomes smaller and the histograms become narrower around 0. However, a narrower sampling distribution does not necessarily mean it is more normal; it means the sample means have less variability.
 
 The commonly used n = 30 guideline is therefore not necessary for this population. Because the original population is already normally distributed, the sampling distribution of the sample mean is also normal even for small sample sizes. Since n = 2 is the smallest sample size I tested and it already satisfies the visual and numerical evidence for normality, I selected n = 2.
 

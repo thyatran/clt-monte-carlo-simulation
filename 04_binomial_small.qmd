@@ -13,7 +13,8 @@ The original population follows a Binomial distribution with 5 trials and a prob
 **Theoretical standard deviation:** approximately 0.671
 
 ```{r}
-set.seed(123)
+student_id <- 3491
+set.seed(student_id)
 
 population <- rbinom(10000, size = 5, prob = 0.10)
 
@@ -147,9 +148,9 @@ From the table results, I notice that the simulated means stay close to 0.5, and
 
 I consider the sampling distribution approximately normal at n = 40. From the histograms, I notice that the distribution becomes more symmetric and bell-shaped, and the bars follow the red Normal curve fairly closely. The Q-Q plot also shows that most of the points follow the reference line, with only small deviations at the tails.
 
-I considered n = 20 because its histogram already looked fairly bell-shaped. The numerical results are also promising, with skewness of 0.268 and excess kurtosis of 0.039. However, the Q-Q plot still shows noticeable steps and some deviations from the reference line. At n = 40, the points follow the line more closely, which makes me more comfortable calling the distribution approximately normal.
+I considered n = 20 because its histogram already looked fairly bell-shaped. The numerical results are also promising, with skewness of 0.267 and excess kurtosis of 0.026. However, the Q-Q plot still shows noticeable steps and some deviations from the reference line. At n = 40, the points follow the line more closely, which makes me more comfortable calling the distribution approximately Normal.
 
-The numerical results also support this. At n = 40, the simulated mean is 0.500, which matches the theoretical mean of 0.5. The simulated standard error is 0.105, which is very close to the theoretical value of 0.106. The skewness is 0.183 and excess kurtosis is 0.005, both closer to 0 than at n = 20. Although some skewness remains, the distribution looks approximately normal overall.
+The numerical results also support this. At n = 40, the simulated mean is 0.500, which matches the theoretical mean of 0.5. The simulated standard error is 0.107, which is very close to the theoretical value of 0.106. The skewness is 0.245 and excess kurtosis is 0.083. Although some skewness remains, the histogram and Q-Q plot look approximately Normal overall.
 
 I also noticed that larger sample sizes, such as n = 60 and n = 100, follow the Normal curve and Q-Q reference line even more closely. However, the goal is to find the smallest sample size I can call approximately normal, rather than the most perfect fit. Based on the visual and numerical evidence, I selected n = 40 as the smallest sample size where I feel comfortable calling the sampling distribution approximately normal.
 

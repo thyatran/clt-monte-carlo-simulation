@@ -13,7 +13,8 @@ The original population follows a standard Cauchy distribution with location 0 a
 **Theoretical standard deviation:** Undefined
 
 ```{r}
-set.seed(123)
+student_id <- 3491
+set.seed(student_id)
 
 population <- rcauchy(10000, location = 0, scale = 1)
 
@@ -129,7 +130,7 @@ for (n in sample_sizes) {
 par(mfrow = c(1, 1))
 ```
 
-I notice that the Q-Q plots show large deviations from the red reference line, especially at both tails where extreme values occur. Even as n increases from 2 to 100, the points do not follow the line more closely, suggesting that the sampling distributions are not approaching a Normal distribution. 
+I notice that the Q-Q plots show large deviations from the red reference line, especially at both tails where extreme values occur. Even as n increases from 2 to 100, the points do not follow the line more closely, suggesting that the sampling distributions are not approaching a Normal distribution.
 
 Although n = 50 appears to follow the line closely, this is because an extreme value stretches the y-axis and compresses most of the points. Even at larger sample sizes, the distributions do not appear to become more Normal.
 
@@ -149,7 +150,7 @@ results_table <- data.frame(
 results_table
 ```
 
-I notice that the simulated means and the standard deviations fluctuate a lot as n increases, especially at n = 50, where the standard deviation reaches 1627.977. However, the medians stay close to 0, and the IQR remains around 2, showing that the sample means do not become more concentrated as the sample size increases.
+I notice that the simulated means and standard deviations fluctuate a lot as n increases, especially at n = 20, where the standard deviation reaches 4098.380. However, the medians stay close to 0, and the IQR remains around 2, showing that the sample means do not become more concentrated as the sample size increases.
 
 ## 5. Approximately Normal?
 
@@ -157,9 +158,9 @@ I notice that the simulated means and the standard deviations fluctuate a lot as
 
 I do not consider the sampling distribution approximately normal at any of the sample sizes tested. From the histograms, I notice that the distributions look almost identical from n = 2 to n = 100, with a tall peak around 0 and heavy tails on both sides. Unlike the previous experiments, the distributions do not become narrower as n increases.
 
-The Q-Q plots also show large deviations from the red reference line, especially at the tails. Although n = 50 appears to follow the line closely, this is misleading because an extreme value stretches the y-axis and compresses most of the points.
+The Q-Q plots also show large deviations from the red reference line, especially at the tails. Although n = 20 appears to follow the line closely, this is misleading because an extreme value stretches the y-axis and compresses most of the points.
 
-The numerical results also support this conclusion. The simulated standard deviations fluctuate significantly, reaching 1627.977 at n = 50, while the IQR stays around 2 across all sample sizes. This shows that the sample means are not becoming more concentrated as n increases.
+The numerical results also support this conclusion. The simulated standard deviations fluctuate significantly, reaching 4098.380 at n = 20, while the IQR stays around 2 across all sample sizes. This shows that the sample means are not becoming more concentrated as n increases.
 
 Since the Cauchy distribution has no defined mean or standard deviation, it does not meet the conditions of the usual Central Limit Theorem. Therefore, I cannot select a sample size where the sampling distribution becomes approximately normal.
 
@@ -167,7 +168,7 @@ Since the Cauchy distribution has no defined mean or standard deviation, it does
 
 One limitation of this experiment is that the Cauchy distribution can produce extremely large or small values, which makes the simulated means and standard deviation unstable. I also had to limit the histogram display to values between -10 and 10 to make the graphs easier to read. This means the histograms do not show all the extreme values, even though they are still included in the simulations.
 
-One thing I found surprising was that the histograms looked almost identical across all sample sizes, even at n = 100. I also noticed that the Q-Q plot at n = 50 appeared to follow the red line, but this was actually caused by an extreme value stretching the y-axis. This showed me that a graph can sometimes be misleading if the scale is different.
+One thing I found surprising was that the histograms looked almost identical across all sample sizes, even at n = 100. I also noticed that the Q-Q plot at n = 20 appeared to follow the red line, but this was actually caused by an extreme value stretching the y-axis. This showed me that a graph can sometimes be misleading if the scale is different.
 
 ## 7. Conclusion
 
