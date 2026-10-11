@@ -4,23 +4,201 @@ format: html
 editor: visual
 ---
 
-## Quarto
+## 1. Original Population
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+The original population represents the outcomes of rolling a fair six-sided die. It is a discrete uniform distribution because there are six possible values (1 through 6), and each has an equal probability of occurring. Unlike the Standard Normal distribution, the original population is not bell-shaped.
 
-## Running Code
+**Theoretical mean:** 3.5
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
+**Theoretical standard deviation:** approximately 1.708
 
 ```{r}
-#| echo: false
-2 * 2
+
+set.seed(123)
+
+population <- sample(1:6, size = 10000, replace = TRUE)
+
+barplot(
+  table(factor(population, levels = 1:6)), 
+  main = "Six-Sided Die Population",
+  xlab = "Die Outcome",
+  ylab = "Frequency",
+  col = "steelblue"
+)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## 2. Monte Carlo Simulation
+
+I used Monte Carlo simulation to examine the sampling distribution of the sample mean for a fair six-sided die at different sample sizes. For each sample size, I repeatedly simulated rolling a die and calculated the average outcome of each sample.
+
+**Sample sizes tested:** 2, 4, 5, 10, 20, 25, 30, 35, 40, 45, 50, 55, 100
+
+**Number of simulations:** 10,000 for each sample size
+
+```{r}
+# sample sizes to test
+sample_sizes <- c(2, 4, 5, 10, 20, 25, 30, 35, 40, 45, 50, 55, 100)
+
+# number of repeated samples
+num_simulations <- 10000
+
+# function to simulate sample means
+simulate_means <- function(n) {
+  replicate(
+    num_simulations,
+    mean(sample(1:6, size = n, replace=TRUE))
+  )
+}
+
+# run the simulation for every sample size
+simulation_results <- lapply(sample_sizes, simulate_means)
+
+# name each result by its sample size
+names(simulation_results) <- sample_sizes
+```
+
+## 3. Visual Evidence
+
+I used histograms and Normal Q-Q plots to examine how the sampling distribution of the sample mean changes as the sample size increases. Since the original population is discrete uniform rather than Normal, I expect the sampling distributions to become more approximately Normal as the sample size increases.
+
+### 3.1 Histograms
+
+```{r}
+#| fig-width: 14
+#| fig-height: 12
+
+par(mfrow = c(4, 4))
+
+for (n in sample_sizes) {
+  hist(
+    simulation_results[[as.character(n)]],
+    breaks = 20,
+    probability = TRUE,
+    main = paste("n =", n),
+    col = "steelblue",
+    border = "white",
+    xlab = "Sample Mean"
+  )
+  
+  curve(
+    dnorm(x, mean = 3.5, sd = sqrt(35 / 12) / sqrt(n)),
+    add = TRUE,
+    col = "red",
+    lwd = 1
+  )
+}
+
+par(mfrow = c(1, 1))
+```
+
+The histograms show the distribution of 10,000 sample means for each sample size. The red curves represent the theoretical Normal approximations based on the population mean and standard error. I use these graphs to examine how closely the simulated sampling distributions follow a Normal shape as the sample size increases.
+
+At smaller sample sizes, I see noticeable spikes and gaps between the bars. As n increases, the possible sample means become more closely spaced, and the histograms look smoother and more bell-shaped.
+
+### 3.2 Normal Q-Q Plots
+
+```{r}
+#| fig-width: 14
+#| fig-height: 12
+
+par(mfrow = c(4, 4))
+
+for (n in sample_sizes) {
+  
+  qqnorm(
+    simulation_results[[as.character(n)]],
+    main = paste("Q-Q Plot: n =", n),
+    col = "steelblue",
+    pch = 16,
+    cex = 0.4
+  )
+  
+  qqline(
+    simulation_results[[as.character(n)]],
+    col = "red",
+    lwd = 1
+    )
+}
+
+par(mfrow = c(1, 1))
+```
+
+Q-Q plots are used to check whether the sampling distributions look approximately normal. If the points are close to the red reference line, it suggests that the distribution is close to normal. Since the die outcomes are discrete, I expect the points to be more spread out from the line at smaller sample sizes and follow the line more closely as n increases.
+
+At smaller sample sizes, I notice more steps and that the points are farther away from the red reference line. As n increases, especially around n = 20, the points follow the reference line more closely, with fewer noticeable steps and deviations.
+
+## 4. Numerical Evidence
+
+In addition to the histograms and Q-Q plots, I calculated numerical values to check how close the sampling distributions are to normal. I compared the simulated means and standard errors with their theoretical values. I also calculated skewness and excess kurtosis to see how the shape of the sampling distributions changes as the sample size increases.
+
+```{r}
+# function to calculate skewness
+skew <- function(x) {
+  m3 <- mean((x - mean(x))^3)
+  m2 <- mean((x - mean(x))^2)
+  m3 / m2^(3/2)
+}
+
+# function to calculate excess kurtosis
+kurt <- function(x) {
+  m4 <- mean((x - mean(x))^4)
+  m2 <- mean((x - mean(x))^2)
+  m4 / m2^2 - 3
+}
+
+results_table <- data.frame(
+  sample_size = sample_sizes,
+  
+  simulated_mean = round(
+    sapply(simulation_results, mean), 3
+  ),
+  
+  simulated_se = round(
+    sapply(simulation_results, sd), 3
+  ),
+  
+  theoretical_se = round(
+    sqrt(35 / 12) / sqrt(sample_sizes), 3
+  ),
+  
+  skewness = round(
+    sapply(simulation_results, skew), 3
+  ),
+  
+  excess_kurtosis = round(
+    sapply(simulation_results, kurt), 3
+  )
+)
+
+results_table
+```
+
+From the numerical results, the simulated means stay close to the theoretical mean of 3.5 across all sample sizes. The simulated standard errors are also close to the theoretical values and decrease as n increases.
+
+Skewness stays close to 0 even at smaller sample sizes, while excess kurtosis generally gets closer to 0 as n increases. This suggests that the sampling distributions are already fairly symmetric, but their overall shapes become more similar to a Normal distribution as the sample size increases.
+
+## 5. Approximately Normal?
+
+**Selected sample size (n):** 10
+
+I consider the sampling distribution approximately normal at n = 10. From the histograms, I notice that the distribution is already fairly symmetric and bell-shaped, and the bars follow the red Normal curve closely. The Q-Q plot also shows that most of the points follow the reference line, although there are still some deviations at the tails.
+
+At smaller sample sizes, especially n = 2 and n = 5, the histograms have more noticeable gaps and spikes, and the Q-Q plots show more steps. By n = 10, these differences become less noticeable, the bars aligned closely with the reference curve, which makes me comfortable considering the sampling distribution approximately normal.
+
+The numerical evidence also supports my decision. At n = 10, the skewness is -0.031, which is close to 0, and the excess kurtosis is -0.181. Although the excess kurtosis is not exactly 0, it is much closer than at n = 2 (-0.657). The simulated standard error is 0.536, which is close to the theoretical standard error of 0.540. This shows that the simulation agrees with the expected variability of the sample means, although matching standard errors alone does not prove normality.
+
+While the sampling distributions at n = 20 and above follow the Normal curve more closely, the goal is to find the smallest sample size where the sampling distribution looks approximately normal, rather than the sample size with the closest fit. Based on the visual and numerical evidence, n = 10 seems reasonable.
+
+## 6. Limitations and Surprises
+
+One limitation of this experiment is that the decision of when the sampling distribution becomes approximately normal is based partly on visual judgement. Even though I selected n = 10, there is no exact cutoff that determines when a distribution is normal enough. The results are also based on 10,000 simulations, so the histograms and numerical values may change slightly with a different random seed.
+
+One thing I found interesting was that the sampling distribution started looking bell-shaped at relatively small sample sizes, even though the original die population is not normal. I also noticed that skewness was already close to 0 at n = 2, but the histogram and Q-Q plot still showed noticeable differences from a normal distribution. This shows that having skewness close to 0 does not necessarily mean a distribution is normal.
+
+## 7. Conclusion
+
+The Six-Sided Die experiment showed that the sampling distribution of the sample mean can become approximately normal even when the original population is not normally distributed. Based on the visual and numerical evidence, I selected n = 10 as the smallest sample size where I felt comfortable calling the sampling distribution approximately normal.
+
+As the sample size increased, the histograms became smoother and more bell-shaped, and the Q-Q plots followed the reference line more closely. The standard error also decreased, meaning the sample means became more concentrated around the theoretical mean of 3.5. This supports the Central Limit Theorem, which states that the sampling distribution of the sample mean approaches a Normal distribution as the sample size increases, assuming the necessary conditions are met.
+
+Unlike the Standard Normal experiment, where the sampling distribution was already normal at n = 2, the Six-Sided Die experiment showed a more noticeable change in shape as the sample size increased. This suggests that n = 30 is not always necessary, and the sample size needed for approximate normality depends on the original population.

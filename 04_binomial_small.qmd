@@ -4,23 +4,165 @@ format: html
 editor: visual
 ---
 
-## Quarto
+## 1. Original Population
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+The original population follows a Binomial distribution with 5 trials and a probability of success of 0.10. It is a discrete distribution with possible outcomes from 0 to 5. Since the probability of success is low, most observations are expected to be 0 or 1, making the distribution strongly right-skewed rather than symmetric or bell-shaped.
 
-## Running Code
+**Theoretical mean:** 0.5
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
+**Theoretical standard deviation:** approximately 0.671
 
 ```{r}
-#| echo: false
-2 * 2
+set.seed(123)
+
+population <- rbinom(10000, size = 5, prob = 0.10)
+
+barplot(
+  table(factor(population, levels = 0:5)),
+  main = "Binomial Population (n = 5, p = 0.10)",
+  xlab = "Number of Successes",
+  ylab = "Frequency",
+  col = "steelblue"
+)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## 2. Monte Carlo Simulation
+
+For this experiment, I will test different sample sizes to see how the sampling distribution of the sample mean changes as n increases. For each sample size, I will run 10,000 simulations. In each simulation, I will randomly generate n observations from a Binomial distribution with 5 trials and a 0.10 probability of success, then calculate their mean.
+
+**Sample sizes tested (n):** 2, 3, 5, 10, 20, 30, 40, 50, 55, 60, 65, 70, 80, 90, 100
+
+**Number of simulations:** 10,000 for each sample size
+
+```{r}
+sample_sizes <- c(2, 3, 5, 10, 20, 30, 40, 50, 55, 60, 65, 70, 80, 90, 100)
+num_simulations <- 10000
+
+simulate_means <- function(n) {
+  replicate(num_simulations, mean(rbinom(n, size = 5, prob = 0.10)))
+}
+
+simulation_results <- lapply(sample_sizes, simulate_means)
+names(simulation_results) <- sample_sizes
+```
+
+## 3. Visual Evidence
+
+I used histograms and Normal Q-Q plots to examine how the sampling distribution of the sample mean changes as the sample size increases.
+
+### 3.1 Histograms
+
+```{r}
+#| fig-width: 12
+#| fig-height: 12
+
+par(mfrow = c(4, 4))
+
+for (n in sample_sizes) {
+  means <- simulation_results[[as.character(n)]]
+  
+  hist(
+    means,
+    breaks = 20,
+    probability = TRUE,
+    main = paste("n =", n),
+    xlab = "Sample Mean", 
+    col = "steelblue",
+    border = "white"
+  )
+  
+  curve(
+    dnorm(x, mean = 0.5, sd = sqrt(0.45) / sqrt(n)),
+    add = TRUE,
+    col = "red",
+    lwd = 2
+  )
+}
+par(mfrow = c(1, 1))
+```
+
+At smaller sample sizes (n = 2-5), I notice that the histograms have separate spikes and are right-skewed. As n increases, the distributions become more symmetric and bell-shaped, following the red Normal curve more closely around n = 20-40.
+
+### 3.2 Normal Q-Q Plots
+
+```{r}
+#| fig-width: 14
+#| fig-height: 12
+
+par(mfrow = c(4, 4))
+
+for (n in sample_sizes) {
+  means <- simulation_results[[as.character(n)]]
+  
+  qqnorm(
+    means,
+    main = paste("Q-Q Plot: n =", n),
+    col = "steelblue",
+    pch = 16,
+    cex = 0.4
+  )
+  
+  qqline(means, col = "red", lwd = 2)
+}
+
+par(mfrow = c(1, 1))
+```
+
+At smaller sample sizes like n = 2 to n = 10, I notice that the Q-Q plots have noticeable steps and the points do not follow the red reference line closely. As n increases, the points become more aligned with the line, especially around n = 40 and above, although some small deviations remain at the tails.
+
+## 4. Numerical Evidence
+
+For each sample size, I will compare the simulated mean and standard error with the theoretical values. I will also calculate skewness and excess kurtosis to see whether the sampling distribution becomes more symmetric and closer to a Normal distribution as n increases.
+
+```{r}
+skew <- function(x) {
+  m3 <- mean((x - mean(x))^3)
+  m2 <- mean((x - mean(x))^2)
+  m3 / m2^(3/2)
+}
+
+kurt <- function(x) {
+  m4 <- mean((x - mean(x))^4)
+  m2 <- mean((x - mean(x))^2)
+  m4 / m2^2 - 3
+}
+
+results_table <- data.frame(
+  sample_size = sample_sizes,
+  simulated_mean = round(sapply(simulation_results, mean), 3),
+  simulated_se = round(sapply(simulation_results, sd), 3),
+  theoretical_se = round(sqrt(0.45) / sqrt(sample_sizes), 3),
+  skewness = round(sapply(simulation_results, skew), 3),
+  excess_kurtosis = round(sapply(simulation_results, kurt), 3)
+)
+
+results_table
+```
+
+From the table results, I notice that the simulated means stay close to 0.5, and the simulated standard errors closely match the theoretical values. As n increases, the standard errors decrease, while skewness and excess kurtosis generally get closer to 0, suggesting that the sampling distributions become more Normal.
+
+## 5. Approximately Normal?
+
+**Selected sample size (n):** 40
+
+I consider the sampling distribution approximately normal at n = 40. From the histograms, I notice that the distribution becomes more symmetric and bell-shaped, and the bars follow the red Normal curve fairly closely. The Q-Q plot also shows that most of the points follow the reference line, with only small deviations at the tails.
+
+I considered n = 20 because its histogram already looked fairly bell-shaped. The numerical results are also promising, with skewness of 0.268 and excess kurtosis of 0.039. However, the Q-Q plot still shows noticeable steps and some deviations from the reference line. At n = 40, the points follow the line more closely, which makes me more comfortable calling the distribution approximately normal.
+
+The numerical results also support this. At n = 40, the simulated mean is 0.500, which matches the theoretical mean of 0.5. The simulated standard error is 0.105, which is very close to the theoretical value of 0.106. The skewness is 0.183 and excess kurtosis is 0.005, both closer to 0 than at n = 20. Although some skewness remains, the distribution looks approximately normal overall.
+
+I also noticed that larger sample sizes, such as n = 60 and n = 100, follow the Normal curve and Q-Q reference line even more closely. However, the goal is to find the smallest sample size I can call approximately normal, rather than the most perfect fit. Based on the visual and numerical evidence, I selected n = 40 as the smallest sample size where I feel comfortable calling the sampling distribution approximately normal.
+
+## 6. Limitations and Surprises
+
+One limitation of this experiment is that the Binomial population is discrete, so the sampling distributions still show some steps in the Q-Q plots even as the sample size increases. Also, deciding when the distribution is approximately normal is partly based on visual judgment. Although I selected n = 40, there is no exact cutoff, and the results could change slightly with a different random seed.
+
+One thing I found interesting was that the histograms started looking bell-shaped around n = 20, but the Q-Q plot still showed noticeable steps and deviations from the red reference line. I also noticed that even though the original Binomial population is strongly right-skewed, the sampling distribution became much more symmetric as n increased.
+
+## 7. Conclusion
+
+The Binomial experiment showed that even though the original population is discrete and strongly right-skewed, the sampling distribution of the sample mean becomes more approximately normal as the sample size increases. Based on the histograms, Q-Q plots, and numerical evidence, I selected n = 40 as the smallest sample size I felt comfortable calling approximately normal.
+
+As n increased, the histograms became more symmetric and bell-shaped, and the Q-Q plots followed the reference line more closely. The standard error also decreased, meaning the sample means became more concentrated around the theoretical mean of 0.5. This supports the Central Limit Theorem, which explains that as the sample size increases, the distribution of sample means becomes closer to a Normal distribution.
+
+Compared to the previous experiments, the Binomial population needed a larger sample size than the Standard Normal (n = 2), Six-Sided Die (n = 10), and the Exponential (n = 30) populations. This shows that the original population's shape and discreteness can affect how quickly the sampling distribution becomes approximately normal.

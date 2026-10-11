@@ -18,14 +18,21 @@ population <- rnorm(10000, mean = 0, sd = 1)
 
 hist(population,
      breaks = 30,
+     probability = TRUE,
      main = "Standard Normal Population", 
      xlab = "Value")
+
+
+curve(dnorm(x, mean = 0, sd = 1),
+      add = TRUE,
+      col = "red",
+      lwd = 1)
 
 ```
 
 ## 2. Monte Carlo Simulation
 
-I used Monte Carlo simulation to examine the sampling distribution of the sample mean at different sample sizes. For each sample size, I repeatedly drew samples from the standard normal population and calculated the mean of each sample.
+I used Monte Carlo simulation to examine the sampling distribution of the sample mean at different sample sizes. For each sample size, I repeatedly generated random samples from a standard normal population and calculated the mean of each sample.
 
 **Sample sizes tested:** 2, 3, 5, 10, 20, 30, 50, 100
 
@@ -57,7 +64,7 @@ names(simulation_results) <- sample_sizes
 
 I used visual evidence to examine how the sampling distribution changes as the sample size increases.
 
-### Histograms
+### 3.1 Histograms
 
 The histograms below show the distribution of the 10,000 sample means for each sample size. I use these plots to examine whether the sampling distributions appear symmetric and bell-shaped as the sample size increases.
 
@@ -65,20 +72,31 @@ The histograms below show the distribution of the 10,000 sample means for each s
 par(mfrow = c(2, 4))
 
 for (n in sample_sizes) {
+  
   hist(
     simulation_results[[as.character(n)]],
     breaks = 20,
+    probability = TRUE,
     main = paste("n =", n),
     col = "steelblue",
     border = "white",
     xlab = "Sample Mean"
     )
+  
+  curve(
+    dnorm(x, mean = 0, sd = 1 / sqrt(n)),
+    add = TRUE,
+    col = "red",
+    lwd = 1
+  )
 }
 
 par(mfrow = c(1, 1))
 ```
 
-### Normal Q-Q Plots
+The red curves represent the theoretical Normal sampling distributions for each sample size. The simulated histograms closely follow these curves, showing that the sampling distributions are already approximately normal even at small sample sizes.
+
+### 3.2 Normal Q-Q Plots
 
 Normal Q-Q plots provide another way to compare the sampling distributions with a theoretical normal distribution. Points that follow the reference line closely provide evidence that the distribution is approximately normal.
 
@@ -95,7 +113,7 @@ for (n in sample_sizes) {
   qqline(
     simulation_results[[as.character(n)]],
     col = "red",
-    lwd = 2)
+    lwd = 1)
 }
 par(mfrow = c(1, 1))
 ```
@@ -159,7 +177,7 @@ I consider the sampling distribution approximately normal at n = 2, the smallest
 
 Although some larger sample sizes have skewness or kurtosis values even closer to 0, the goal is not to find the sample size with the most perfect numerical values. Instead, I am looking for the smallest sample size where there is enough evidence to consider the sampling distribution approximately normal. Small differences in skewness and kurtosis across the simulations are also expected because the results are based on random simulation.
 
-The simulated standard error at n = 2 is 0.708, which is nearly identical to the theoretical standard error of 0.707. As n increases, the standard error becomes smaller and the histograms become narrower around 0. However, a narrower sampling distribution does not necessarily mean it is more normal; it means the sample means have less variability.
+The simulated standard error (simulated_se) at n = 2 is 0.708, which is nearly identical to the theoretical standard error (theoretical_se) of 0.707. As n increases, the standard error becomes smaller and the histograms become narrower around 0. However, a narrower sampling distribution does not necessarily mean it is more normal; it means the sample means have less variability.
 
 The commonly used n = 30 guideline is therefore not necessary for this population. Because the original population is already normally distributed, the sampling distribution of the sample mean is also normal even for small sample sizes. Since n = 2 is the smallest sample size I tested and it already satisfies the visual and numerical evidence for normality, I selected n = 2.
 
